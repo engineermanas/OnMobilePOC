@@ -7,8 +7,11 @@
 //
 
 #import "AppDelegate.h"
+#import "OnMobileCoreDataManager.h"
+#import "ReminderConstant.h"
 
 @interface AppDelegate ()
+
 
 @end
 
@@ -17,6 +20,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    [[OnMobileCoreDataManager sharedInstance] masterManagedObjectContext];
+    [self registerForLocalNotifications];
+    
     return YES;
 }
 
@@ -45,7 +52,20 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    
+    [[OnMobileCoreDataManager sharedInstance] saveContext];
 }
 
+#pragma register for notifications
+
+-(void)registerForLocalNotifications
+{
+    if(!IS_iOS7) //This is not necessary < iOS 8.
+    {
+        UIUserNotificationType notificationTypes = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:notificationTypes categories:nil];
+        [[UIApplication sharedApplication]registerUserNotificationSettings:settings];
+    }
+}
 
 @end

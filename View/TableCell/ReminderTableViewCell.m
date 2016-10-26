@@ -11,7 +11,7 @@
 
 @implementation ReminderTableViewCell
 
-@synthesize reminderTitle,reminderTime,reminderFrequency,reminderStartStopSwitch;
+@synthesize reminderTitle,reminderTime,reminderFrequency,reminderStartStopSwitch,delegate;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -39,6 +39,8 @@
         reminderFrequency.backgroundColor = [UIColor clearColor];
         
         reminderStartStopSwitch = [[UISwitch alloc] init];
+        [reminderStartStopSwitch addTarget:self action:@selector(reminderStartAndStop:) forControlEvents:UIControlEventValueChanged];
+
         
         [self.contentView addSubview:reminderTitle];
         [self.contentView addSubview:reminderTime];
@@ -47,6 +49,14 @@
 
     }
     return self;
+}
+
+- (void) reminderStartAndStop:(UISwitch *)sender {
+    
+    if ([delegate respondsToSelector:@selector(userSelectedValue:)]) {
+        
+        [delegate userSelectedValue:sender];
+    }
 }
 
 - (void)layoutSubviews

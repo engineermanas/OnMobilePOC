@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "CreateReminderController.h"
+#import "ReminderTableViewCell.h"
 
-@interface ReminderListViewController : UIViewController <CreateReminderControllerDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface ReminderListViewController : UIViewController <CreateReminderControllerDelegate,UISwitchStateChangeDelegate,UITableViewDelegate, UITableViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UITableView *reminderListTableView;
 

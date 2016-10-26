@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DatePickerViewController.h"
 
-@protocol CreateReminderControllerDelegate
+@protocol CreateReminderControllerDelegate <NSObject>
 
 -(void)reminderWasSuccessfullySavedWithData:(NSDictionary*)reminderDetails;
 

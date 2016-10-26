@@ -13,8 +13,10 @@
 @end
 
 @implementation DatePickerViewController
+@synthesize delegate;
 
 - (void)viewDidLoad {
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 }
@@ -22,8 +24,11 @@
 - (IBAction)savePickerDate:(id)sender
 {
     // Notify the caller that a date was selected.
-    [self.delegate dateWasSelected:self.dtDatePicker.date];
-    [self popViewController];
+    if ([delegate respondsToSelector:@selector(dateWasSelected:)]) {
+        
+        [delegate dateWasSelected:self.dtDatePicker.date];
+        [self popViewController];
+    }
 }
 
 - (IBAction)cancelPickerDate:(id)sender {

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 // Protocol defined to Notify the caller
-@protocol DatePickerViewControllerDelegate
+@protocol DatePickerViewControllerDelegate <NSObject>
 
 -(void)dateWasSelected:(NSDate *)selectedDate;
 

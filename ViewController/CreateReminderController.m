@@ -9,6 +9,7 @@
 #import "CreateReminderController.h"
 #import <EventKit/EventKit.h>
 #import "ReminderConstant.h"
+#import "ReminderHelperManager.h"
 
 @interface CreateReminderController ()
 
@@ -18,12 +19,14 @@
 @property (nonatomic, strong) NSArray *remindersRepeatOptionArray;
 @property (nonatomic) NSUInteger selectedRepeatReminderIndex;
 
-
 @end
 
-NSString * const kDATE_FORMAT = kDateFormat;
-
 @implementation CreateReminderController
+
+@synthesize delegate;
+
+#pragma mark - ViewController LifeCycle
+#pragma mark
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -43,10 +46,16 @@ NSString * const kDATE_FORMAT = kDateFormat;
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - User Selection Action
+#pragma mark
+
 - (IBAction)saveReminder:(id)sender {
     
-    [self.delegate reminderWasSuccessfullySavedWithData:self.reminderDetailsDict];
-    [self popViewController];
+    if ([delegate respondsToSelector:@selector(reminderWasSuccessfullySavedWithData:)]) {
+        
+        [delegate reminderWasSuccessfullySavedWithData:self.reminderDetailsDict];
+        [self popViewController];
+    }
 }
 
 - (IBAction)cancelReminder:(id)sender {
@@ -59,7 +68,8 @@ NSString * const kDATE_FORMAT = kDateFormat;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-#pragma mark - DatePickerViewControllerDelegate method implementation
+#pragma mark - DatePicker Selection Method Delegate
+#pragma mark
 
 -(void)dateWasSelected:(NSDate *)selectedDate {
     
@@ -72,7 +82,7 @@ NSString * const kDATE_FORMAT = kDateFormat;
             
             // The event start date.
             self.reminderTime = selectedDate;
-            [self.reminderDetailsDict setObject:[self stringFromDateLocalTimeZone:self.reminderTime] forKey:kReminderTime];
+            [self.reminderDetailsDict setObject:[ReminderHelperManager stringFromDateLocalTimeZone:self.reminderTime] forKey:kReminderTime];
         }
     }
 
@@ -80,7 +90,8 @@ NSString * const kDATE_FORMAT = kDateFormat;
     [self.createReminderTable reloadData];
 }
 
-#pragma mark - Navigation
+#pragma mark - Navigation Segue
+#pragma mark
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -93,7 +104,8 @@ NSString * const kDATE_FORMAT = kDateFormat;
     }
 }
 
-#pragma mark - UITableView Delegate and Datasource method implementation
+#pragma mark - UITableView Datasource
+#pragma mark
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     
@@ -166,7 +178,7 @@ NSString * const kDATE_FORMAT = kDateFormat;
                 }
                 else{
                     
-                    cell.textLabel.text = [self stringFromDateLocalTimeZone:self.reminderTime];
+                    cell.textLabel.text = [ReminderHelperManager stringFromDateLocalTimeZone:self.reminderTime];
                 }
                 break;
             default:
@@ -202,6 +214,8 @@ NSString * const kDATE_FORMAT = kDateFormat;
     return 60.0;
 }
 
+#pragma mark - UITableView Delegate
+#pragma mark
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -219,6 +233,7 @@ NSString * const kDATE_FORMAT = kDateFormat;
 }
 
 #pragma mark - UITextFieldDelegate method implementation
+#pragma mark
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
     
@@ -232,25 +247,5 @@ NSString * const kDATE_FORMAT = kDateFormat;
     
     [self.reminderDetailsDict setObject:textField.text forKey:kReminderTitle];
 }
-
-- (NSString *)stringFromDateLocalTimeZone:(NSDate *)date
-{
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:kDATE_FORMAT];
-    NSString *stringFromDate = [formatter stringFromDate:date];
-    return stringFromDate;
-}
-
-- (NSDate *)dateFromString:(NSString *)dateAsString
-{
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:kTimeLocale];
-    [dateFormatter setLocale:locale];
-    [dateFormatter setDateFormat:kDATE_FORMAT];
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:kTimeZone]];
-    NSDate *dateFromString = [dateFormatter dateFromString:dateAsString];
-    return dateFromString ;
-}
-
 
 @end

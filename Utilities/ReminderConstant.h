@@ -6,6 +6,9 @@
 //  Copyright © 2016 Personal Solution LTD. All rights reserved.
 //
 
+#import "ReminderHelperManager.h"
+
+#define IS_iOS7 ([ReminderHelperManager DeviceSystemMajorVersion] == 7)
 
 #define  kCellBackgroundColor [UIColor colorWithRed:242.0f/255.0f green:242.0f/255.0f blue:242.0f/255.0f alpha:1.0f]
 

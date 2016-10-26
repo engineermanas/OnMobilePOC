@@ -8,8 +8,16 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol  UISwitchStateChangeDelegate <NSObject>
+
+- (void)userSelectedValue:(UISwitch*)sender;
+
+@end
+
+
 @interface ReminderTableViewCell : UITableViewCell
 
+@property (nonatomic, weak) id<UISwitchStateChangeDelegate> delegate;
 
 @property (nonatomic,strong) UILabel *reminderTitle;
 @property (nonatomic,strong) UILabel *reminderTime;
