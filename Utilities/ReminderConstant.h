@@ -39,13 +39,13 @@
 
 #define kNillString              @""
 #define kReminderTitle           @"ReminderTitle"
-#define kReminderStartTime       @"Reminder start time"
+#define kReminderStartTime       @"ReminderStartTime"
 #define kReminderTime            @"ReminderTime"
 #define kReminderFrequency       @"ReminderFrequency"
 
 // Reminder Frequency Array
 
-#define kReminderFrequencyArray  @[@"Minutes", @"Hourly", @"Daily", @"Weekly", @"Monthly", @"Yearly"]
+#define kReminderFrequencyArray  @[@"None", @"Minutes", @"Hourly", @"Daily", @"Weekly", @"Monthly", @"Yearly"]
 
 // StoryBord SegueID
 
@@ -61,3 +61,10 @@
 #define  kReminderGeneralCell    @"idCellGeneral"
 #define  kReminderTitleCell      @"idCellTitle"
 #define  kReminderTableListCell  @"ReminderTableCellIdentifier"
+
+
+// AlertView Relatd Macro
+
+#define  kAlertTitle          @"Thank You"
+#define  kAlertAction         @"Ok"
+

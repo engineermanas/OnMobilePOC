@@ -10,14 +10,18 @@
 #import <EventKit/EventKit.h>
 #import "ReminderConstant.h"
 #import "ReminderHelperManager.h"
+#import "ReminderAlertPopView.h"
+
 
 @interface CreateReminderController ()
 
 @property (nonatomic, strong) NSString *reminderTitle;
 @property (nonatomic, strong) NSDate *reminderTime;
+@property (nonatomic, strong) NSString *reminderFrequency;
 @property (nonnull, strong) NSMutableDictionary *reminderDetailsDict;
 @property (nonatomic, strong) NSArray *remindersRepeatOptionArray;
 @property (nonatomic) NSUInteger selectedRepeatReminderIndex;
+@property (nonatomic, strong) UITextField *reminderTitleTextField;
 
 @end
 
@@ -29,15 +33,20 @@
 #pragma mark
 
 - (void)viewDidLoad {
+    
     [super viewDidLoad];
     
     // Set initial values.
     self.reminderDetailsDict = [[NSMutableDictionary alloc] init];
     self.reminderTime = nil;
-    
+    self.reminderTitleTextField.delegate = self;
     // Initialize the repeat reminders array.
     self.remindersRepeatOptionArray = kReminderFrequencyArray;
     self.selectedRepeatReminderIndex = 0;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -51,10 +60,47 @@
 
 - (IBAction)saveReminder:(id)sender {
     
-    if ([delegate respondsToSelector:@selector(reminderWasSuccessfullySavedWithData:)]) {
+    [self.reminderTitleTextField resignFirstResponder];
+    self.reminderTitle = self.reminderTitleTextField.text;
+    [self.reminderDetailsDict setObject:self.reminderTitleTextField.text forKey:kReminderTitle];
+    
+    if ([self isCorrectUserInput]) {
         
-        [delegate reminderWasSuccessfullySavedWithData:self.reminderDetailsDict];
-        [self popViewController];
+        [self.reminderDetailsDict setObject:@"YES" forKey:kReminderStartTime];
+        
+        if ([delegate respondsToSelector:@selector(reminderWasSuccessfullySavedWithData:)]) {
+            
+            [delegate reminderWasSuccessfullySavedWithData:self.reminderDetailsDict];
+            [self popViewController];
+        }
+    }
+}
+
+- (BOOL)isCorrectUserInput {
+    
+    if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderDetailsDict]) {
+        
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"OOPS!" WithAlertMessage:@"Create Your Remider"];
+        return NO;
+        
+    } else if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderTitle]) {
+        
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"Reminder!" WithAlertMessage:@"Title has not been defined"];
+        return NO;
+        
+    } else if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderTime]) {
+        
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"Reminder!" WithAlertMessage:@"Time has not been defined"];
+        return NO;
+        
+    } else if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderFrequency]) {
+        
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"Reminder!" WithAlertMessage:@"Reminder has not been defined"];
+        return NO;
+        
+    } else {
+        
+        return YES;
     }
 }
 
@@ -112,7 +158,6 @@
     return 2;
 }
 
-
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
     if (section == 0) {
@@ -157,16 +202,15 @@
             cell.textLabel.font  = myFont;
         }
         
-        
         switch (indexPath.row) {
             case 0:
                 
                 // The title of the reminder.
             {
-                UITextField *titleTextfield = (UITextField *)[cell.contentView viewWithTag:10];
-                titleTextfield.delegate = self;
-                self.reminderTitle = titleTextfield.text;
-                titleTextfield.font = myFont;
+                self.reminderTitleTextField = (UITextField *)[cell.contentView viewWithTag:10];
+                self.reminderTitleTextField.delegate = self;
+                self.reminderTitle = self.reminderTitleTextField.text;
+                self.reminderTitleTextField.font = myFont;
             }
                 break;
                 
@@ -227,7 +271,8 @@
     if (indexPath.section == 1) {
         
         self.selectedRepeatReminderIndex = indexPath.row;
-        [self.reminderDetailsDict setObject:[self.remindersRepeatOptionArray objectAtIndex:indexPath.row] forKey:kReminderFrequency];
+        self.reminderFrequency = [self.remindersRepeatOptionArray objectAtIndex:self.selectedRepeatReminderIndex];
+        [self.reminderDetailsDict setObject:self.reminderFrequency forKey:kReminderFrequency];
         [self.createReminderTable reloadData];
     }
 }
@@ -235,17 +280,11 @@
 #pragma mark - UITextFieldDelegate method implementation
 #pragma mark
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
+// This method enables or disables the processing of return key
+-(BOOL) textFieldShouldReturn:(UITextField *)textField {
     
-    self.reminderTitle = textField.text;
-    [textField resignFirstResponder];
-    
-    return YES;
-}
-
-- (void)textFieldDidEndEditing:(UITextField *)textField {
-    
-    [self.reminderDetailsDict setObject:textField.text forKey:kReminderTitle];
+    [self.reminderTitleTextField resignFirstResponder];
+    return NO;
 }
 
 @end

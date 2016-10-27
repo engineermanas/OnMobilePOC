@@ -58,5 +58,44 @@
     return _deviceSystemMajorVersion;
 }
 
+// Any Object can be validate from here to return YES or NO
++ (BOOL)dataObjectIsNilwithObject:(id)object
+{
+    BOOL objectIsNil;
+    NSString *objectAsString;
+    
+    if ([object isKindOfClass:[NSString class]]) {
+        
+        objectAsString = (NSString *)object;
+        
+        if (objectAsString == nil || [objectAsString isEqualToString:@""] || objectAsString == (id)[NSNull null]) {
+            objectIsNil = YES;
+            return objectIsNil;
+        }
+        else {
+            objectIsNil = NO;
+            return objectIsNil;
+        }
+    }
+    else {
+        if (object == nil || object == (id)[NSNull null]) {
+            
+            objectIsNil = YES;
+            return objectIsNil;
+            
+        } else {
+            
+            if (object != nil) {
+                objectIsNil = NO;
+                return objectIsNil;
+            }
+            else {
+                objectIsNil = YES;
+                return objectIsNil;
+            }
+        }
+    }
+}
+
 
 @end

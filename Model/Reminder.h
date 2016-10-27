@@ -14,7 +14,7 @@
 @property (nonatomic, strong) NSString * title;
 @property (nonatomic, strong) NSString * frequency;
 @property (nonatomic, strong) NSDate * time;
-@property (readwrite,atomic) BOOL isValid;
+@property (assign) BOOL isValid;
 
 
 @end

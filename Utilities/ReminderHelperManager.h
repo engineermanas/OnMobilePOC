@@ -16,4 +16,7 @@
 + (NSString *)stringFromDateLocalTimeZone:(NSDate *)date;
 + (NSDate *)dateFromString:(NSString *)dateAsString;
 
+// Object Validation
++ (BOOL)dataObjectIsNilwithObject:(id)object;
+
 @end

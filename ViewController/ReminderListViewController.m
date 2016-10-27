@@ -38,6 +38,9 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    // By Default Reminder is set to YES
+    self.isReminderON = YES;
     self.reminderListArray = [[NSMutableArray alloc] initWithArray:[[OnMobileCoreDataManager sharedInstance] getReminderDetails]];
 }
 
@@ -87,7 +90,6 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         // Cell background color
         cell.backgroundColor = kCellBackgroundColor;
-
     }
     
     // Get Cell Index All Value
@@ -97,8 +99,6 @@
     cell.reminderFrequency.text = reminder.frequency;
     cell.reminderStartStopSwitch.selected = reminder.isValid;
     
-    //[cell.reminderStartStopSwitch addTarget:self action:@selector(reminderStartAndStop:) forControlEvents:UIControlEventValueChanged];
-
     return cell;
     
 }
@@ -146,20 +146,23 @@
 
 -(void)reminderWasSuccessfullySavedWithData:(NSDictionary*)reminderDetails {
     
-    // Once User Save the Reinder Details Save into CoreData
+    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:60];
+    // [reminderDetails objectForKey:kReminderTime];
+    localNotification.timeZone = [NSTimeZone defaultTimeZone];
+    localNotification.alertBody = [reminderDetails objectForKey:kReminderTitle];
+    localNotification.alertAction = @"Details";
+    localNotification.applicationIconBadgeNumber = [[UIApplication sharedApplication] applicationIconBadgeNumber] + 1;
+    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+    
+    
+    // Once User Save the Reinder Details Then Save into CoreData
     [[OnMobileCoreDataManager sharedInstance] saveReminderDetails:[self convertDictionaryIntoReminderModelArray:reminderDetails]];
     
-    // Assign those user data into array to update the table row
+    // Assign those user data into array to update the table view row
     self.reminderListArray = [[[OnMobileCoreDataManager sharedInstance] getReminderDetails] copy];
     [self.reminderListTableView reloadData];
-    
-    
-//    UILocalNotification *aNotification = [[UILocalNotification alloc] init];
-//    aNotification.fireDate = [reminderDetails objectForKey:@"ReminderTime"];
-//    aNotification.timeZone = [NSTimeZone defaultTimeZone];
-//    aNotification.alertBody = @"Notification triggered";
-//    aNotification.alertAction = @"Details";
-//    [[UIApplication sharedApplication] scheduleLocalNotification:aNotification];
+
     
     
 }
@@ -170,12 +173,10 @@
     
     Reminder *reminder = [NSEntityDescription insertNewObjectForEntityForName:@"Reminder"
                                                      inManagedObjectContext:managedObjectContext];
-
-    //Reminder *reminder = [[Reminder alloc] initWithEntity:@"Reminder" insertIntoManagedObjectContext:[OnMobileCoreDataManager sharedInstance]];
     reminder.title = [dictionary objectForKey:kReminderTitle];
     reminder.time = [ReminderHelperManager dateFromString:[dictionary objectForKey:kReminderTime]];;
     reminder.frequency = [dictionary objectForKey:kReminderFrequency];
-    reminder.isValid = self.isReminderON;
+    //reminder.isValid = self.isReminderON;
     
     return reminder;
 }
@@ -189,6 +190,7 @@
     // Pass the selected object to the new view controller.
     
     if ([segue.identifier isEqualToString:kSegueCreateReminderID]) {
+        
         CreateReminderController *datePickerViewController = [segue destinationViewController];
         datePickerViewController.delegate = self;
     }

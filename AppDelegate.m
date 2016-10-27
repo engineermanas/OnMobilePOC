@@ -22,6 +22,14 @@
     // Override point for customization after application launch.
     
     [[OnMobileCoreDataManager sharedInstance] masterManagedObjectContext];
+    
+    // Handle launching from a notification
+    UILocalNotification *locationNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+    if (locationNotification) {
+        // Set icon badge number to zero
+        application.applicationIconBadgeNumber = 0;
+    }
+
     [self registerForLocalNotifications];
     
     return YES;
@@ -56,7 +64,23 @@
     [[OnMobileCoreDataManager sharedInstance] saveContext];
 }
 
-#pragma register for notifications
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    UIApplicationState state = [application applicationState];
+    if (state == UIApplicationStateActive) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reminder"
+                                                        message:notification.alertBody
+                                                       delegate:self cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+    
+    // Set icon badge number to zero
+    application.applicationIconBadgeNumber = 0;
+}
+
+#pragma - register for notifications
+#pragma - 
 
 -(void)registerForLocalNotifications
 {
