@@ -21,7 +21,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    [[OnMobileCoreDataManager sharedInstance] masterManagedObjectContext];
+    //[[OnMobileCoreDataManager sharedInstance] masterManagedObjectContext];
     
     // Handle launching from a notification
     UILocalNotification *locationNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
@@ -61,7 +61,7 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     
-    [[OnMobileCoreDataManager sharedInstance] saveContext];
+    [[OnMobileCoreDataManager sharedInstance] saveContextWithCompletionBlock:nil];
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification

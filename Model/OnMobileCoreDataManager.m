@@ -8,7 +8,7 @@
 
 #import "OnMobileCoreDataManager.h"
 #import "ReminderConstant.h"
-//#import "Reminder.h"
+#import "ReminderModel.h"
 
 @implementation OnMobileCoreDataManager
 
@@ -66,7 +66,6 @@
     backgroundManagedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     backgroundManagedObjectContext.parentContext = [self UIManagedObjectContext];
     [backgroundManagedObjectContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-    backgroundManagedObjectContext.undoManager = nil;
     return backgroundManagedObjectContext;
     
 }
@@ -76,7 +75,6 @@
     if (UIManagedObjectContext != nil) {
         return UIManagedObjectContext;
     }
-    
     
     UIManagedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
     UIManagedObjectContext.parentContext = [self masterManagedObjectContext];
@@ -130,7 +128,7 @@
 #pragma mark - MOCS Saving
 #pragma mark
 
-- (void)saveContext {
+- (void)saveContextWithCompletionBlock:(void (^)(BOOL response))completionBlock {
     
     NSError *error = nil;
     NSManagedObjectContext *managedObjectContext = self.masterManagedObjectContext;
@@ -139,9 +137,15 @@
     {
         if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error])
         {
-            
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
+        } else {
+            
+            if (completionBlock) {
+                
+                completionBlock(YES);
+            }
+            NSLog(@"Successfully Data Saved in CoreData");
         }
     }
 }
@@ -192,19 +196,19 @@
 #pragma mark - Reminder Saving Logic Goes Here
 #pragma mark
 
--(void)saveReminderDetails:(Reminder*)reminderDetails {
+-(void)saveReminderDetails:(ReminderModel *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock {
     
     NSManagedObjectContext *managedObjectContext = [self masterManagedObjectContext];
     
     [self.masterManagedObjectContext performBlock:^{
         
-        Reminder *reminder = [NSEntityDescription insertNewObjectForEntityForName:@"Reminder" inManagedObjectContext:managedObjectContext];
+        ReminderManagedObject *reminder = [NSEntityDescription insertNewObjectForEntityForName:@"Reminder" inManagedObjectContext:managedObjectContext];
         reminder.title = reminderDetails.title;
         reminder.time = reminderDetails.time;
         reminder.frequency = reminderDetails.frequency;
-        reminder.isValid = reminderDetails.isValid;
+        //reminder.isValid = reminderDetails.isReminderStartTime;
         
-        [self saveContext];
+        [self saveContextWithCompletionBlock:completionBlock];
     }];
 }
 
@@ -216,8 +220,7 @@
     NSManagedObjectContext *managedObjectContext = [self masterManagedObjectContext];
     NSArray *reminderObjects =nil;
     NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Reminder"];
-    //NSEntityDescription* entity = [NSEntityDescription entityForName:@"Reminder" inManagedObjectContext:managedObjectContext];
-    //[request setEntity:entity];
+    [request setReturnsObjectsAsFaults:NO];
     NSError *error = nil;
     reminderObjects = [managedObjectContext executeFetchRequest:request error:&error];
     if(error)
@@ -227,6 +230,8 @@
     
     if (reminderObjects && [reminderObjects count]) {
         
+        //NSLog(@"Fetch Request Array Count==>>%lu",(unsigned long)reminderObjects.count);
+        //NSLog(@"Fetch Request Array Details==>>%@",reminderObjects.description);
         return reminderObjects;
     }
     return nil;

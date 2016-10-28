@@ -11,6 +11,8 @@
 #import "ReminderConstant.h"
 #import "ReminderHelperManager.h"
 #import "ReminderAlertPopView.h"
+#import "ReminderModel.h"
+#import "OnMobileCoreDataManager.h"
 
 
 @interface CreateReminderController ()
@@ -66,15 +68,42 @@
     
     if ([self isCorrectUserInput]) {
         
-        [self.reminderDetailsDict setObject:@"YES" forKey:kReminderStartTime];
-        
-        if ([delegate respondsToSelector:@selector(reminderWasSuccessfullySavedWithData:)]) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             
-            [delegate reminderWasSuccessfullySavedWithData:self.reminderDetailsDict];
-            [self popViewController];
-        }
+            [self saveInCoreData:self.reminderDetailsDict WithCompletionBlock:^(BOOL response) {
+                
+                if (response) {
+                    
+                    if ([delegate respondsToSelector:@selector(reminderWasSuccessfullySavedWithData:)]) {
+                        
+                        [delegate reminderWasSuccessfullySavedWithData:self.reminderDetailsDict];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                            [self popViewController];
+                        });
+                    }
+                }
+            }];
+        });
     }
 }
+
+- (void)saveInCoreData:(NSDictionary*)dictData WithCompletionBlock:(void (^)(bool response))completionBlock{
+    // Once User Save the Reinder Details Then Save into CoreData
+    [[OnMobileCoreDataManager sharedInstance] saveReminderDetails:[self convertDictionaryIntoReminderModelArray:dictData] withCompletionBlock:completionBlock];
+}
+
+- (ReminderModel *) convertDictionaryIntoReminderModelArray:(NSDictionary *)dictionary {
+    
+    ReminderModel *reminder = [[ReminderModel alloc] init];
+    reminder.title = [dictionary objectForKey:kReminderTitle];
+    reminder.time = [ReminderHelperManager dateFromString:[dictionary objectForKey:kReminderTime]];;
+    reminder.frequency = [dictionary objectForKey:kReminderFrequency];
+    reminder.isReminderStartTime = [dictionary objectForKey:kReminderStartTime];
+    
+    return reminder;
+}
+
 
 - (BOOL)isCorrectUserInput {
     
@@ -100,6 +129,7 @@
         
     } else {
         
+        [self.reminderDetailsDict setObject:@"YES" forKey:kReminderStartTime];
         return YES;
     }
 }

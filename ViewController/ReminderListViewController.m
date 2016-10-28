@@ -11,7 +11,7 @@
 #import "ReminderTableViewCell.h"
 #import "ReminderConstant.h"
 #import "OnMobileCoreDataManager.h"
-#import "Reminder.h"
+#import "ReminderModel.h"
 #import "ReminderHelperManager.h"
 #import <UserNotifications/UserNotifications.h>
 #import <UserNotificationsUI/UserNotificationsUI.h>
@@ -41,13 +41,18 @@
     
     // By Default Reminder is set to YES
     self.isReminderON = YES;
-    self.reminderListArray = [[NSMutableArray alloc] initWithArray:[[OnMobileCoreDataManager sharedInstance] getReminderDetails]];
+    self.reminderListArray = [[NSMutableArray alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     
     [self viewTitleName];
+    // Before fetching data from coredata, remove all the previously cached data from the local array
+    [self.reminderListArray removeAllObjects];
+    // Fetch the data from coredata storage
+    self.reminderListArray = [(NSArray *)[[OnMobileCoreDataManager sharedInstance] getReminderDetails] mutableCopy];
     [self.reminderListTableView reloadData];
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -93,11 +98,11 @@
     }
     
     // Get Cell Index All Value
-    Reminder *reminder = [self.reminderListArray objectAtIndex:indexPath.row];
+    ReminderModel *reminder = [self.reminderListArray objectAtIndex:indexPath.row];
     cell.reminderTitle.text = reminder.title;
-    cell.reminderTime.text = [ReminderHelperManager stringFromDateLocalTimeZone:reminder.time];
+    cell.reminderTime.text = [reminder.time description];
     cell.reminderFrequency.text = reminder.frequency;
-    cell.reminderStartStopSwitch.selected = reminder.isValid;
+    //cell.reminderStartStopSwitch.selected = reminder.isReminderStartTime;
     
     return cell;
     
@@ -146,39 +151,27 @@
 
 -(void)reminderWasSuccessfullySavedWithData:(NSDictionary*)reminderDetails {
     
+//    // Today's Date
+//    NSDate *today = [NSDate new];
+//    // Date With Class Method
+//    NSDate *tomorrow1 = [NSDate dateWithTimeInterval:60*60*24 sinceDate:today];
+//    NSLog(@"Date from class method: %@", tomorrow1);
+//    // Date With Instance Method
+//    NSDate *tomorrow2 = [today dateByAddingTimeInterval:60*60*24];
+//    NSLog(@"Date from instance method: %@", tomorrow2);
+    
+    //NSLog(@"Dictionary Time==>>%@",[reminderDetails objectForKey:kReminderTime]);
+    //NSTimeInterval myTimestamp = [[reminderDetails objectForKey:kReminderTime] doubleValue];
+    
     UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:60];
-    // [reminderDetails objectForKey:kReminderTime];
-    localNotification.timeZone = [NSTimeZone defaultTimeZone];
+    localNotification.fireDate = [ReminderHelperManager dateFromString:[reminderDetails objectForKey:kReminderTime]];
+    localNotification.timeZone = [NSTimeZone timeZoneWithAbbreviation:kTimeZone];
     localNotification.alertBody = [reminderDetails objectForKey:kReminderTitle];
     localNotification.alertAction = @"Details";
     localNotification.applicationIconBadgeNumber = [[UIApplication sharedApplication] applicationIconBadgeNumber] + 1;
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
     
     
-    // Once User Save the Reinder Details Then Save into CoreData
-    [[OnMobileCoreDataManager sharedInstance] saveReminderDetails:[self convertDictionaryIntoReminderModelArray:reminderDetails]];
-    
-    // Assign those user data into array to update the table view row
-    self.reminderListArray = [[[OnMobileCoreDataManager sharedInstance] getReminderDetails] copy];
-    [self.reminderListTableView reloadData];
-
-    
-    
-}
-
-- (Reminder *) convertDictionaryIntoReminderModelArray:(NSDictionary *)dictionary {
-    
-    NSManagedObjectContext *managedObjectContext = [[OnMobileCoreDataManager sharedInstance] masterManagedObjectContext];
-    
-    Reminder *reminder = [NSEntityDescription insertNewObjectForEntityForName:@"Reminder"
-                                                     inManagedObjectContext:managedObjectContext];
-    reminder.title = [dictionary objectForKey:kReminderTitle];
-    reminder.time = [ReminderHelperManager dateFromString:[dictionary objectForKey:kReminderTime]];;
-    reminder.frequency = [dictionary objectForKey:kReminderFrequency];
-    //reminder.isValid = self.isReminderON;
-    
-    return reminder;
 }
 
 #pragma mark - Navigation Segue

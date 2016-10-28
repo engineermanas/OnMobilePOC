@@ -33,8 +33,7 @@
 {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:kDateFormat];
-    NSString *stringFromDate = [formatter stringFromDate:date];
-    return stringFromDate;
+    return [formatter stringFromDate:date];
 }
 
 + (NSDate *)dateFromString:(NSString *)dateAsString
@@ -44,8 +43,7 @@
     [dateFormatter setLocale:locale];
     [dateFormatter setDateFormat:kDateFormat];
     [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:kTimeZone]];
-    NSDate *dateFromString = [dateFormatter dateFromString:dateAsString];
-    return dateFromString ;
+    return [dateFormatter dateFromString:dateAsString] ;
 }
 
 + (NSInteger)DeviceSystemMajorVersion

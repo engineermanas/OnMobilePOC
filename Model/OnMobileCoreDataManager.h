@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#import "Reminder.h"
-
+#import "ReminderManagedObject.h"
+#import "ReminderModel.h"
 
 
 @interface OnMobileCoreDataManager : NSObject
@@ -24,9 +24,9 @@
 
 -(NSManagedObjectContext*)masterManagedObjectContext;
 
-- (void)saveContext;
+- (void)saveContextWithCompletionBlock:(void (^)(BOOL response))completionBlock;
 
--(void)saveReminderDetails:(Reminder *)reminderDetails;
+-(void)saveReminderDetails:(ReminderModel *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock;
 
 -(NSArray *)getReminderDetails;
 
