@@ -11,10 +11,10 @@
 
 @interface ReminderManagedObject :NSManagedObject
 
-@property (nonatomic, strong) NSString * title;
-@property (nonatomic, strong) NSString * frequency;
-@property (nonatomic, strong) NSDate * time;
-@property (assign) BOOL isValid;
+@property (nonatomic, strong) NSString* title;
+@property (nonatomic, strong) NSString* frequency;
+@property (nonatomic, strong) NSDate* time;
+@property (nonatomic, strong) NSNumber* isValid;
 
 
 @end

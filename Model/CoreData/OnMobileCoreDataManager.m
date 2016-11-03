@@ -9,6 +9,7 @@
 #import "OnMobileCoreDataManager.h"
 #import "ReminderConstant.h"
 #import "ReminderModel.h"
+#import "ReminderHelperManager.h"
 
 @implementation OnMobileCoreDataManager
 
@@ -196,20 +197,49 @@
 #pragma mark - Reminder Saving Logic Goes Here
 #pragma mark
 
--(void)saveReminderDetails:(ReminderModel *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock {
+-(void)saveReminderDetails:(NSDictionary *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock {
     
     NSManagedObjectContext *managedObjectContext = [self masterManagedObjectContext];
     
     [self.masterManagedObjectContext performBlock:^{
         
         ReminderManagedObject *reminder = [NSEntityDescription insertNewObjectForEntityForName:@"Reminder" inManagedObjectContext:managedObjectContext];
-        reminder.title = reminderDetails.title;
-        reminder.time = reminderDetails.time;
-        reminder.frequency = reminderDetails.frequency;
-        //reminder.isValid = reminderDetails.isReminderStartTime;
+        if (reminder)
+        {
+            if (reminderDetails)
+            {
+                if (![ReminderHelperManager dataObjectIsNilwithObject:[reminderDetails objectForKey:kReminderTitle]]) {
+                    
+                    reminder.title = [reminderDetails objectForKey:kReminderTitle];
+                    
+                }
+                if (![ReminderHelperManager dataObjectIsNilwithObject:[reminderDetails objectForKey:kReminderTime]]) {
+                    
+                    reminder.time = [ReminderHelperManager dateFromString:[reminderDetails objectForKey:kReminderTime]];
+                    
+                }
+                if (![ReminderHelperManager dataObjectIsNilwithObject:[reminderDetails objectForKey:kReminderFrequency]]) {
+                    
+                    reminder.frequency = [reminderDetails objectForKey:kReminderFrequency];
+                    
+                }
+                if (![ReminderHelperManager dataObjectIsNilwithObject:[reminderDetails objectForKey:kReminderStartTime]]) {
+                    
+                    reminder.isValid = [NSNumber numberWithBool:[reminderDetails objectForKey:kReminderStartTime]];
+                }
+            }
+        }
         
         [self saveContextWithCompletionBlock:completionBlock];
     }];
+}
+
+#pragma mark - Delete Reminder Logic Goes Here
+#pragma mark
+
+- (void)deleteManagedObject:(NSManagedObject*)object {
+    
+    [self.masterManagedObjectContext deleteObject:object];
 }
 
 #pragma mark - Fetch Reminder Logic Goes Here
@@ -229,9 +259,6 @@
     }
     
     if (reminderObjects && [reminderObjects count]) {
-        
-        //NSLog(@"Fetch Request Array Count==>>%lu",(unsigned long)reminderObjects.count);
-        //NSLog(@"Fetch Request Array Details==>>%@",reminderObjects.description);
         return reminderObjects;
     }
     return nil;

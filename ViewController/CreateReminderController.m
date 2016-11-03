@@ -90,20 +90,8 @@
 
 - (void)saveInCoreData:(NSDictionary*)dictData WithCompletionBlock:(void (^)(bool response))completionBlock{
     // Once User Save the Reinder Details Then Save into CoreData
-    [[OnMobileCoreDataManager sharedInstance] saveReminderDetails:[self convertDictionaryIntoReminderModelArray:dictData] withCompletionBlock:completionBlock];
+    [[OnMobileCoreDataManager sharedInstance] saveReminderDetails:dictData withCompletionBlock:completionBlock];
 }
-
-- (ReminderModel *) convertDictionaryIntoReminderModelArray:(NSDictionary *)dictionary {
-    
-    ReminderModel *reminder = [[ReminderModel alloc] init];
-    reminder.title = [dictionary objectForKey:kReminderTitle];
-    reminder.time = [ReminderHelperManager dateFromString:[dictionary objectForKey:kReminderTime]];;
-    reminder.frequency = [dictionary objectForKey:kReminderFrequency];
-    reminder.isReminderStartTime = [dictionary objectForKey:kReminderStartTime];
-    
-    return reminder;
-}
-
 
 - (BOOL)isCorrectUserInput {
     

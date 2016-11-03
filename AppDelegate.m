@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "OnMobileCoreDataManager.h"
 #import "ReminderConstant.h"
+#import "OnMobileLocalNotificationManager.h"
 
 @interface AppDelegate ()
 
@@ -66,6 +67,7 @@
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
+    [[OnMobileLocalNotificationManager sharedInstance] cancelLocalNotificationWithData:(NSDictionary *)notification];
     UIApplicationState state = [application applicationState];
     if (state == UIApplicationStateActive) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reminder"

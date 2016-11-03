@@ -26,8 +26,8 @@
 
 - (void)saveContextWithCompletionBlock:(void (^)(BOOL response))completionBlock;
 
--(void)saveReminderDetails:(ReminderModel *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock;
-
+-(void)saveReminderDetails:(NSDictionary *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock;
+- (void)deleteManagedObject:(NSManagedObject*)object;
 -(NSArray *)getReminderDetails;
 
 @end

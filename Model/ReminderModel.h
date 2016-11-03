@@ -13,6 +13,6 @@
 @property (nonatomic, strong) NSString * title;
 @property (nonatomic, strong) NSString * frequency;
 @property (nonatomic, strong) NSDate * time;
-@property (assign) BOOL isReminderStartTime;
+@property (nonatomic, strong) NSNumber* isReminderStartTime;
 
 @end

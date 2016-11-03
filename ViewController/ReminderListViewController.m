@@ -15,7 +15,7 @@
 #import "ReminderHelperManager.h"
 #import <UserNotifications/UserNotifications.h>
 #import <UserNotificationsUI/UserNotificationsUI.h>
-
+#import "OnMobileLocalNotificationManager.h"
 
 @interface ReminderListViewController ()
 
@@ -97,21 +97,27 @@
         cell.backgroundColor = kCellBackgroundColor;
     }
     
-    // Get Cell Index All Value
-    ReminderModel *reminder = [self.reminderListArray objectAtIndex:indexPath.row];
-    cell.reminderTitle.text = reminder.title;
-    cell.reminderTime.text = [reminder.time description];
-    cell.reminderFrequency.text = reminder.frequency;
-    //cell.reminderStartStopSwitch.selected = reminder.isReminderStartTime;
+    // Get Cell Index Value
+    ReminderManagedObject *cellIndex = [self.reminderListArray objectAtIndex:indexPath.row];
+    
+    if (cellIndex) {
+        cell.reminderTitle.text = cellIndex.title;
+        cell.reminderTime.text = [cellIndex.time description];
+        cell.reminderFrequency.text = [NSString stringWithFormat:@"Repeat for every : %@",cellIndex.frequency];//cellIndex.frequency;
+        [cell.reminderStartStopSwitch setOn:[cellIndex.isValid boolValue]];
+        return cell;
+    }
     
     return cell;
-    
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
+        NSManagedObject *managedObject = [self.reminderListArray objectAtIndex:indexPath.row];
+        [[OnMobileCoreDataManager sharedInstance] deleteManagedObject:managedObject];
+        [[OnMobileCoreDataManager sharedInstance] saveContextWithCompletionBlock:nil];
         // If your source is an NSMutableArray do this
         [self.reminderListArray removeObjectAtIndex:indexPath.row];
         
@@ -126,8 +132,17 @@
 
 - (void)userSelectedValue:(UISwitch *)sender {
     
+    //UISwitch *switchInCell = (UISwitch *)sender;
+    UITableViewCell * cell = (UITableViewCell*) sender.superview.superview;
+    NSIndexPath * indexpath = [self.reminderListTableView indexPathForCell:cell];
+    NSManagedObject *managedObject = [self.reminderListArray objectAtIndex:indexpath.row];
     self.isReminderON = sender.on;
+    NSLog(@"Managed Object Details==>>%@",managedObject);
     NSLog(sender.on ? @"YES" : @"NO");
+    NSArray *keys = [[[managedObject entity] attributesByName] allKeys];
+    NSDictionary *dict = [managedObject dictionaryWithValuesForKeys:keys];
+    managedObject = nil;
+    NSLog(@"Dictionary Details==>>%@",dict);
 }
 
 #pragma mark - User Selection Action
@@ -151,26 +166,7 @@
 
 -(void)reminderWasSuccessfullySavedWithData:(NSDictionary*)reminderDetails {
     
-//    // Today's Date
-//    NSDate *today = [NSDate new];
-//    // Date With Class Method
-//    NSDate *tomorrow1 = [NSDate dateWithTimeInterval:60*60*24 sinceDate:today];
-//    NSLog(@"Date from class method: %@", tomorrow1);
-//    // Date With Instance Method
-//    NSDate *tomorrow2 = [today dateByAddingTimeInterval:60*60*24];
-//    NSLog(@"Date from instance method: %@", tomorrow2);
-    
-    //NSLog(@"Dictionary Time==>>%@",[reminderDetails objectForKey:kReminderTime]);
-    //NSTimeInterval myTimestamp = [[reminderDetails objectForKey:kReminderTime] doubleValue];
-    
-    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-    localNotification.fireDate = [ReminderHelperManager dateFromString:[reminderDetails objectForKey:kReminderTime]];
-    localNotification.timeZone = [NSTimeZone timeZoneWithAbbreviation:kTimeZone];
-    localNotification.alertBody = [reminderDetails objectForKey:kReminderTitle];
-    localNotification.alertAction = @"Details";
-    localNotification.applicationIconBadgeNumber = [[UIApplication sharedApplication] applicationIconBadgeNumber] + 1;
-    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-    
+    [[OnMobileLocalNotificationManager sharedInstance] scheduleLocalNotificationWithData:reminderDetails];
     
 }
 
