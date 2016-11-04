@@ -132,17 +132,18 @@
 
 - (void)userSelectedValue:(UISwitch *)sender {
     
-    //UISwitch *switchInCell = (UISwitch *)sender;
     UITableViewCell * cell = (UITableViewCell*) sender.superview.superview;
     NSIndexPath * indexpath = [self.reminderListTableView indexPathForCell:cell];
     NSManagedObject *managedObject = [self.reminderListArray objectAtIndex:indexpath.row];
     self.isReminderON = sender.on;
-    NSLog(@"Managed Object Details==>>%@",managedObject);
-    NSLog(sender.on ? @"YES" : @"NO");
     NSArray *keys = [[[managedObject entity] attributesByName] allKeys];
-    NSDictionary *dict = [managedObject dictionaryWithValuesForKeys:keys];
-    managedObject = nil;
-    NSLog(@"Dictionary Details==>>%@",dict);
+    NSMutableDictionary *dict = [[managedObject dictionaryWithValuesForKeys:keys] mutableCopy];
+    [dict setObject:[NSNumber numberWithBool:sender.on] forKey:kReminderStartTime];
+    [[OnMobileCoreDataManager sharedInstance] updateReminderInfoWithDetails:dict withCompletionBlock:^(BOOL response) {
+        if (response) {
+            NSLog(@"All Goes Well");
+        }
+    }];
 }
 
 #pragma mark - User Selection Action

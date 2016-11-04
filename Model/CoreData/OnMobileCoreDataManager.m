@@ -138,7 +138,7 @@
     {
         if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error])
         {
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            NSLog(@"CoreData Save Unresolved error==>>%@, %@", error, [error userInfo]);
             abort();
         } else {
             
@@ -162,7 +162,7 @@
         
         if (error) {
             
-            NSLog(@"backgroundManagedObjectContext....Error==>>%@",error.description);
+            NSLog(@"backgroundManagedObjectContext Save Error==>>%@",error.description);
         }
     }];
 
@@ -179,9 +179,8 @@
         
         if (error) {
             
-            NSLog(@"UIManagedObjectContext....Error==>>%@",error.description);
+            NSLog(@"UIManagedObjectContext Save Error==>>%@",error.description);
         }
-        
     }];
 }
 
@@ -194,7 +193,7 @@
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
 
-#pragma mark - Reminder Saving Logic Goes Here
+#pragma mark - Save Reminder Info Into CoreData
 #pragma mark
 
 -(void)saveReminderDetails:(NSDictionary *)reminderDetails withCompletionBlock:(void (^)(BOOL response))completionBlock {
@@ -234,15 +233,16 @@
     }];
 }
 
-#pragma mark - Delete Reminder Logic Goes Here
+#pragma mark - Delete Reminder Info From CoreData
 #pragma mark
 
 - (void)deleteManagedObject:(NSManagedObject*)object {
     
     [self.masterManagedObjectContext deleteObject:object];
+    NSLog(@"Successfully Deleted From CoreData");
 }
 
-#pragma mark - Fetch Reminder Logic Goes Here
+#pragma mark - Fetch Reminder Info From CoreData
 #pragma mark
 
 -(NSArray *)getReminderDetails {
@@ -255,13 +255,35 @@
     reminderObjects = [managedObjectContext executeFetchRequest:request error:&error];
     if(error)
     {
-        NSLog(@"%@",error);
+        NSLog(@"CoreData Fetch Request Error==>>%@",error.description);
     }
     
     if (reminderObjects && [reminderObjects count]) {
         return reminderObjects;
     }
     return nil;
+}
+
+- (void)updateReminderInfoWithDetails:(NSDictionary *)updateDetails withCompletionBlock:(void (^)(BOOL response))completionBlock {
+    
+    NSManagedObjectContext *managedObjectContext = [self masterManagedObjectContext];
+    
+    [[self masterManagedObjectContext] performBlock:^{
+        
+        NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Reminder"];
+        [request setReturnsObjectsAsFaults:NO];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title == %@", [updateDetails objectForKey:@"title"]];
+        [request setPredicate:predicate];
+        NSError *error = nil;
+        ReminderManagedObject *reminder = [[managedObjectContext executeFetchRequest:request error:&error] lastObject];
+        if (!error) {
+            reminder.isValid = [updateDetails objectForKey:kReminderStartTime];
+        }
+        if (reminder != nil) {
+            
+            [self saveContextWithCompletionBlock:completionBlock];
+        }
+    }];
 }
 
 @end

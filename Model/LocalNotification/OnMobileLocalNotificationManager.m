@@ -62,8 +62,10 @@
         return NSCalendarUnitWeekday;
     else if ([selectedInterval isEqualToString:@"Monthly"])
         return NSCalendarUnitMonth;
-    else ([selectedInterval isEqualToString:@"Yearly"]);
+    else if ([selectedInterval isEqualToString:@"Yearly"])
         return NSCalendarUnitYear;
+    else
+        return 0;
 }
 
 @end
