@@ -12,7 +12,7 @@
 
 + (instancetype)sharedInstance;
 
--(void)scheduleLocalNotificationWithData:(NSDictionary*)reminderDetails;
--(void)cancelLocalNotificationWithData:(NSDictionary*)reminderDetails;
+-(void)scheduleLocalNotificationWithData:(NSDictionary *)reminderDetails;
+-(void)cancelLocalNotificationWithData:(id)notifications;
 
 @end

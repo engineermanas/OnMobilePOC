@@ -43,11 +43,10 @@
 
 }
 
--(void)cancelLocalNotificationWithData:(NSDictionary*)reminderDetails {
+-(void)cancelLocalNotificationWithData:(id)notifications {
     
-    [[UIApplication sharedApplication] cancelAllLocalNotifications];
-    NSArray * scheduledReminderArray = [[UIApplication sharedApplication] scheduledLocalNotifications];
-    NSLog(@"Notification Details==>>%@",scheduledReminderArray);
+    [[UIApplication sharedApplication] cancelLocalNotification:notifications];
+    //[[UIApplication sharedApplication] cancelAllLocalNotifications];
 }
 
 - (NSCalendarUnit)getCalenderUnitWithUserSelectedReminderInterval:(NSString*)selectedInterval {

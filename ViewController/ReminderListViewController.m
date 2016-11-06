@@ -103,7 +103,7 @@
     if (cellIndex) {
         cell.reminderTitle.text = cellIndex.title;
         cell.reminderTime.text = [cellIndex.time description];
-        cell.reminderFrequency.text = [NSString stringWithFormat:@"Repeat for every : %@",cellIndex.frequency];//cellIndex.frequency;
+        cell.reminderFrequency.text = [NSString stringWithFormat:kRepeatFor,cellIndex.frequency];//cellIndex.frequency;
         [cell.reminderStartStopSwitch setOn:[cellIndex.isValid boolValue]];
         return cell;
     }
@@ -191,7 +191,7 @@
 
 - (void) viewTitleName {
     
-    self.title = self.reminderListArray.count ? kReminderList : kCreateRemibnder;
+    self.title = self.reminderListArray.count ? kReminderList : kCreateReminder;
 }
 
 @end

@@ -97,27 +97,27 @@
     
     if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderDetailsDict]) {
         
-        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"OOPS!" WithAlertMessage:@"Create Your Remider"];
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:kOOPS WithAlertMessage:kCreateYourReminder];
         return NO;
         
     } else if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderTitle]) {
         
-        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"Reminder!" WithAlertMessage:@"Title has not been defined"];
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:kReminderAleart WithAlertMessage:kEmptyTitle];
         return NO;
         
     } else if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderTime]) {
         
-        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"Reminder!" WithAlertMessage:@"Time has not been defined"];
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:kReminderAleart WithAlertMessage:kEmptyTime];
         return NO;
         
-    } else if ([ReminderHelperManager dataObjectIsNilwithObject:self.reminderFrequency]) {
+    } else if ([self.reminderFrequency isEqualToString:kNone] || [ReminderHelperManager dataObjectIsNilwithObject:self.reminderFrequency]) {
         
-        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:@"Reminder!" WithAlertMessage:@"Reminder has not been defined"];
+        [[ReminderAlertPopView sharedInstance] showAlertToUserWithView:self WithAlertTitle:kReminderAleart WithAlertMessage:kEmptyReminder];
         return NO;
         
     } else {
         
-        [self.reminderDetailsDict setObject:@"YES" forKey:kReminderStartTime];
+        [self.reminderDetailsDict setObject:kYES forKey:kReminderStartTime];
         return YES;
     }
 }

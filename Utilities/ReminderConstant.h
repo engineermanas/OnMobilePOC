@@ -12,11 +12,19 @@
 
 #define  kCellBackgroundColor [UIColor colorWithRed:242.0f/255.0f green:242.0f/255.0f blue:242.0f/255.0f alpha:1.0f]
 
+// CoreData Related
+#define kOnMobileSqliteFileName     @"OnMobile.sqlite"
+#define kOnMobileMOMDName           @"OnMobilePOC"
+#define kOnMobileMOMDExt            @"momd"
+#define kOnMobileEntityName         @"Reminder"
+#define kTitlePredicate             @"title == %@"
+
 #define kTableCellHeight 100
 #define kDateFormat     @"yyyy-MM-dd HH:mm"
 #define kTimeLocale     @"en_US_POSIX"
 #define kTimeZone       @"UTC"
 #define kReminderFormat @"%@ Reminder"
+#define kRepeatFor      @"Repeat for every : %@"
 
 // FontStyle
 
@@ -25,7 +33,7 @@
 
 // Reminder List View Title Name
 
-#define kCreateRemibnder   @"Create Reminder"
+#define kCreateReminder   @"Create Reminder"
 #define kReminderList      @"Reminder List"
 
 // Custom Table Cell Frame
@@ -38,6 +46,7 @@
 // Reminder Data Model KeyValue Keys
 
 #define kNillString              @""
+#define kYES                     @"YES"
 #define kReminderTitle           @"ReminderTitle"
 #define kReminderStartTime       @"ReminderStartTime"
 #define kReminderTime            @"ReminderTime"
@@ -65,6 +74,17 @@
 
 // AlertView Relatd Macro
 
+#define  kOOPS                @"OOPS!"
 #define  kAlertTitle          @"Thank You"
-#define  kAlertAction         @"Ok"
+#define  kAlertActionOK       @"Ok"
+#define  kNone                @"None"
+#define  kCreateYourReminder  @"Create Your Remider"
+#define  kReminderAleart      @"Reminder!"
+#define  kEmptyTitle          @"Title has not been defined"
+#define  kEmptyTime           @"Time has not been defined"
+#define  kEmptyReminder       @"Reminder has not been defined"
+
+
+
+
 

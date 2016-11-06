@@ -32,7 +32,7 @@
                                                                          message:message
                                                                   preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertAction* yesButton = [UIAlertAction actionWithTitle:kAlertAction
+    UIAlertAction* yesButton = [UIAlertAction actionWithTitle:kAlertActionOK
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           

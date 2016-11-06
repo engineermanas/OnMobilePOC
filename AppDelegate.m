@@ -67,18 +67,23 @@
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
-    //[[OnMobileLocalNotificationManager sharedInstance] cancelLocalNotificationWithData:(NSDictionary *)notification];
-    UIApplicationState state = [application applicationState];
-    if (state == UIApplicationStateActive) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reminder"
-                                                        message:notification.alertBody
-                                                       delegate:self cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-        [alert show];
+    if ([[OnMobileCoreDataManager sharedInstance] isTheReminderOnFor:notification.userInfo[kReminderTitle]]) {
+        
+        UIApplicationState state = [application applicationState];
+        if (state == UIApplicationStateActive) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:kReminderAleart
+                                                            message:notification.alertBody
+                                                           delegate:self cancelButtonTitle:kAlertActionOK
+                                                  otherButtonTitles:nil];
+            [alert show];
+        }
+        
+        // Set icon badge number to zero
+        application.applicationIconBadgeNumber = 0;
+    } else {
+        
+        [[OnMobileLocalNotificationManager sharedInstance] cancelLocalNotificationWithData:(id)notification];
     }
-    
-    // Set icon badge number to zero
-    application.applicationIconBadgeNumber = 0;
 }
 
 #pragma - register for notifications

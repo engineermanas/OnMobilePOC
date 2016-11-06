@@ -94,7 +94,7 @@
         return persistentStoreCoordinator;
     }
     
-    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"OnMobile.sqlite"];
+    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:kOnMobileSqliteFileName];
     NSError *error = nil;
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc]
                                   initWithManagedObjectModel:[self managedObjectModel]];
@@ -121,7 +121,7 @@
         return managedObjectModel;
     }
 
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"OnMobilePOC" withExtension:@"momd"];
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:kOnMobileMOMDName withExtension:kOnMobileMOMDExt];
     managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     return managedObjectModel;
 }
@@ -202,7 +202,7 @@
     
     [self.masterManagedObjectContext performBlock:^{
         
-        ReminderManagedObject *reminder = [NSEntityDescription insertNewObjectForEntityForName:@"Reminder" inManagedObjectContext:managedObjectContext];
+        ReminderManagedObject *reminder = [NSEntityDescription insertNewObjectForEntityForName:kOnMobileEntityName inManagedObjectContext:managedObjectContext];
         if (reminder)
         {
             if (reminderDetails)
@@ -249,7 +249,7 @@
     
     NSManagedObjectContext *managedObjectContext = [self masterManagedObjectContext];
     NSArray *reminderObjects =nil;
-    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Reminder"];
+    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:kOnMobileEntityName];
     [request setReturnsObjectsAsFaults:NO];
     NSError *error = nil;
     reminderObjects = [managedObjectContext executeFetchRequest:request error:&error];
@@ -270,20 +270,36 @@
     
     [[self masterManagedObjectContext] performBlock:^{
         
-        NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Reminder"];
+        NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:kOnMobileEntityName];
         [request setReturnsObjectsAsFaults:NO];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title == %@", [updateDetails objectForKey:@"title"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:kTitlePredicate, [updateDetails objectForKey:@"title"]];
         [request setPredicate:predicate];
         NSError *error = nil;
         ReminderManagedObject *reminder = [[managedObjectContext executeFetchRequest:request error:&error] lastObject];
-        if (!error) {
+        
+        if ((!error) && (reminder != nil)) {
             reminder.isValid = [updateDetails objectForKey:kReminderStartTime];
-        }
-        if (reminder != nil) {
-            
             [self saveContextWithCompletionBlock:completionBlock];
         }
     }];
 }
 
+-(BOOL)isTheReminderOnFor:(NSString *)title {
+    
+    BOOL isOn;
+    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:kOnMobileEntityName];
+    [request setReturnsObjectsAsFaults:NO];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:kTitlePredicate, title];
+    [request setPredicate:predicate];
+    NSError *error = nil;
+    ReminderManagedObject *reminder = [[[self masterManagedObjectContext] executeFetchRequest:request error:&error] lastObject];
+    if ((!error) && (reminder != nil)) {
+        isOn = [reminder.isValid boolValue];
+    }
+    
+    return isOn;
+}
+
 @end
+
+
